@@ -1,24 +1,40 @@
 import time
 import requests
 import serial
-
-
-
-
+import json
 
 def serialWrite():
-    a = 5
-    while a > 0:
-        a = a - 1
+    try :
         ser = serial.Serial("/dev/pts/3")
-        ser.write(b'hello \n')  
-        print("ini serial \n ",a)         
-        time.sleep(2)
-    
-    test()
+        print ('serial open')
+        a=7 
+        while a > 0 :
+            a = a-1
+            ser.write(b'1\n')
+            print("writing",a)
+            time.sleep(1) 
+        # write api to 0
+        try : 
+            data = {"nomor": "1","status": "0"}
+            headers = {"Content-Type": "application/json"}
+            r = requests.put("http://client666.pythonanywhere.com/beautycare/apicopi/status/1/", data=json.dumps(data), headers=headers)
+            print("habis time")
+            res = r.json()
+            print("result PUT =",res)
+        except :
+            print ('tidak terkirim', r)
+        ser.close()
+        test()
 
-       
-
+    except :
+        print("serial not connexted")
+        # send to api error serial 
+        data = {"nomor": "1","status": "0"}
+        headers = {"Content-Type": "application/json"}
+        r = requests.put("http://client666.pythonanywhere.com/beautycare/apicopi/status/1/", data=json.dumps(data), headers=headers)
+        resp = r.json()
+        print(resp)
+        test()
 
 def test() :
     t = 9
@@ -37,14 +53,11 @@ def test() :
                 serialWrite()
             else :
                 t = 9
-
             # time.sleep(1)
         except (requests.ConnectionError, requests.Timeout) as exception:
             t = 9
             print("No internet connection.")
         time.sleep(0.3)
-
-    
 
 test() 
    
